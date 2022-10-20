@@ -137,7 +137,7 @@ class RegTrainer(Trainer):
                     N, -1), dim=1).detach().cpu().numpy()
                 res = pre_count - gd_count
                 print('\rstep: {:>{}}/{} loss: {:.4f} pre: {:.4f} gt: {:.4f}'.format(step, len(str(len(
-                    self.dataloaders['train']))), len(self.dataloaders['train'], res, pre_count, gd_count)), end='')
+                    self.dataloaders['train']))), len(self.dataloaders['train']), loss.item(), pre_count.item(), gd_count.item()), end='')
                 epoch_loss.update(loss.item(), N)
                 epoch_mse.update(np.mean(res * res), N)
                 epoch_mae.update(np.mean(abs(res)), N)

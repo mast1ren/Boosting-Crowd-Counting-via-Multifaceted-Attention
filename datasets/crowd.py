@@ -22,9 +22,9 @@ def cal_innner_area(c_left, c_up, c_right, c_down, bbox):
     inner_up = np.maximum(c_up, bbox[:, 1])
     inner_right = np.minimum(c_right, bbox[:, 2])
     inner_down = np.minimum(c_down, bbox[:, 3])
-    inner_area = np.maximum(inner_right-inner_left, 0.0) * np.maximum(inner_down-inner_up, 0.0)
+    inner_area = np.maximum(inner_right-inner_left, 0.0) * \
+        np.maximum(inner_down-inner_up, 0.0)
     return inner_area
-
 
 
 class Crowd(data.Dataset):
@@ -51,7 +51,8 @@ class Crowd(data.Dataset):
         else:
             self.trans = transforms.Compose([
                 transforms.ToTensor(),
-                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                transforms.Normalize([0.485, 0.456, 0.406], [
+                                     0.229, 0.224, 0.225])
             ])
 
     def __len__(self):
@@ -76,7 +77,7 @@ class Crowd(data.Dataset):
     def train_transform(self, img, keypoints):
         """random crop image patch and find people in it"""
         wd, ht = img.size
-        # assert len(keypoints) > 0
+        assert len(keypoints) > 0
         if random.random() > 0.88:
             img = img.convert('L').convert('RGB')
         re_size = random.random() * 0.5 + 0.75
@@ -114,4 +115,4 @@ class Crowd(data.Dataset):
             if random.random() > 0.5:
                 img = F.hflip(img)
         return self.trans(img), torch.from_numpy(keypoints.copy()).float(), \
-               torch.from_numpy(target.copy()).float(), st_size
+            torch.from_numpy(target.copy()).float(), st_size
