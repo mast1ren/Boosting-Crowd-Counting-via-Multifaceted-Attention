@@ -67,7 +67,11 @@ class Crowd(data.Dataset):
             print(os.path.basename(img_path).split('.')[0])
         if self.method == 'train':
             keypoints = np.load(gd_path)
-            return self.train_transform(img, keypoints)
+            input, points, target, st_size = self.train_transform(img, keypoints)
+            gd = np.array([len(p) for p in points], dtype=np.float32)
+            if gd.sum() < 10:
+                return None, points, target, st_size
+            return input, points, target, st_size
         elif self.method == 'val':
             keypoints = np.load(gd_path)
             img = self.trans(img)

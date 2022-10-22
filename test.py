@@ -11,7 +11,7 @@ args = None
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Test ')
-    parser.add_argument('--data-dir', default='JHU_Train_Val_Test',
+    parser.add_argument('--data-dir', default='./preprocessed_data',
                         help='training data directory')
     parser.add_argument('--save-dir', default='model/model.pth',
                         help='model directory')
@@ -24,17 +24,20 @@ if __name__ == '__main__':
     args = parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.device.strip()  # set vis gpu
 
-    datasets = Crowd(os.path.join(args.data_dir, 'test'), 512, 8, is_gray=False, method='val')
+    datasets = Crowd(os.path.join(args.data_dir, 'test'), 1024, 8, is_gray=False, method='val')
     dataloader = torch.utils.data.DataLoader(datasets, 1, shuffle=False,
-                                             num_workers=8, pin_memory=False)
+                                             num_workers=0, pin_memory=False)
 
     device = torch.device('cuda')
     model = vgg19_trans()
     model.to(device)
     model.eval()
-
-    model.load_state_dict(torch.load(args.save_dir, device))
+    if args.save_dir.endswith('.pth'):
+        model.load_state_dict(torch.load(args.save_dir, device))
+    else:
+        model.load_state_dict(torch.load(args.save_dir, device)['model_state_dict'])
     epoch_minus = []
+    it = 0
     for inputs, count, name in dataloader:
         inputs = inputs.to(device)
         b, c, h, w = inputs.shape
@@ -71,6 +74,9 @@ if __name__ == '__main__':
                 outputs = model(inputs)[0]
                 res = count[0].item() - torch.sum(outputs).item()
                 epoch_minus.append(res)
+        it += 1
+        print('\r{:>{}}/{}: {}'.format(it, len(str(len(dataloader))), len(dataloader), res), end='')
+    print()
 
     epoch_minus = np.array(epoch_minus)
     mse = np.sqrt(np.mean(np.square(epoch_minus)))

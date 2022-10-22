@@ -2,3 +2,5 @@
 *.npy
 *.pyc
 *.log
+*.tar
+*.pth

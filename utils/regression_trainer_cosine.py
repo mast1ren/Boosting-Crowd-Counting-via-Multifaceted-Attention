@@ -18,12 +18,19 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def train_collate(batch):
+    if isinstance(batch, list):
+        batch = [(imgs,points, targets, st_sizes) for imgs,points, targets, st_sizes in batch if imgs is not None]
+    if batch == []:
+        return None, 1,2,3
     transposed_batch = list(zip(*batch))
     images = torch.stack(transposed_batch[0], 0)
     # the number of points is not fixed, keep it as a list of tensor
     points = transposed_batch[1]
     targets = transposed_batch[2]
     st_sizes = torch.FloatTensor(transposed_batch[3])
+    # gd_count = np.array([len(p) for p in points], dtype=np.float32)
+    # if gd_count.item() < 10.0:
+    #     return (None, None, None, None)
     return images, points, targets, st_sizes
 
 
@@ -109,6 +116,8 @@ class RegTrainer(Trainer):
 
         # Iterate over data.
         for step, (inputs, points, targets, st_sizes) in enumerate(self.dataloaders['train']):
+            if inputs is None:
+                continue
             inputs = inputs.to(self.device)
             st_sizes = st_sizes.to(self.device)
             gd_count = np.array([len(p) for p in points], dtype=np.float32)
@@ -198,11 +207,12 @@ class RegTrainer(Trainer):
             else:
                 with torch.set_grad_enabled(False):
                     outputs = self.model(inputs)[0]
+                    gt = count[0].item()
+                    pred = torch.sum(outputs).item()
                     # save_results(inputs, outputs, self.vis_dir, '{}.jpg'.format(name[0]))
-                    res = count[0].item() - torch.sum(outputs).item()
+                    res = gt -pred
                     epoch_res.append(res)
-            print('\r{:>{}}/{}, res: {:.4f}, pre: {:.4f}, gt: {:.4f}'.format(i, len(str(len(self.dataloaders['val']))), len(
-                self.dataloaders['val']), res, torch.sum(outputs).item(), count[0].item()), end='')
+            print('\r{:>{}}/{}, res: {:.4f}'.format(i, len(str(len(self.dataloaders['val']))), len(self.dataloaders['val']), res), end='')
             i += 1
         print()
 
