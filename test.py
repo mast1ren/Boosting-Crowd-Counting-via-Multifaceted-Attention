@@ -77,7 +77,7 @@ if __name__ == '__main__':
         it += 1
         print('\r{:>{}}/{}: {}'.format(it, len(str(len(dataloader))), len(dataloader), res), end='')
     print()
-
+    print('max: {}, min: {}'.format(max(np.abs(epoch_minus)), min(np.abs(epoch_minus))))
     epoch_minus = np.array(epoch_minus)
     mse = np.sqrt(np.mean(np.square(epoch_minus)))
     mae = np.mean(np.abs(epoch_minus))
