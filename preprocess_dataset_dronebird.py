@@ -111,6 +111,7 @@ if __name__ == '__main__':
             # im_list = glob(os.path.join(sub_dir, '*jpg'))
             i = 0
             for im_path in im_list:
+                im_path = os.path.join('../../ds/dronebird' ,im_path)
                 name = os.path.basename(im_path)
                 # print(name)
                 path = os.path.join(args.origin_dir, im_path)
