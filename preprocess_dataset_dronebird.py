@@ -46,7 +46,8 @@ def find_dis(point):
 def generate_data(im_path):
     im = Image.open(im_path)
     im_w, im_h = im.size
-    mat_path = im_path.replace('.jpg', '.mat').replace('data', 'annotation')
+    mat_path = os.path.join(os.path.dirname(im_path).replace(
+        'images', 'ground_truth'), 'GT_'+os.path.basename(im_path).replace('jpg', 'mat'))
     points = loadmat(mat_path)['locations'].astype(np.float32)
     idx_mask = (points[:, 0] >= 0) * (points[:, 0] <= im_w) * \
         (points[:, 1] >= 0) * (points[:, 1] <= im_h)
@@ -88,8 +89,8 @@ if __name__ == '__main__':
                 i = 0
                 for path in paths:
                     im_path = path
-                    name = im_path.split('/')[-3] + \
-                        '_' + os.path.basename(im_path)
+                    name = os.path.basename(im_path)
+                    im_path = os.path.join(args.origin_dir, im_path)
                     im, points = generate_data(im_path)
                     if sub_phase == 'train':
                         dis = find_dis(points)
@@ -110,9 +111,10 @@ if __name__ == '__main__':
             # im_list = glob(os.path.join(sub_dir, '*jpg'))
             i = 0
             for im_path in im_list:
-                name = im_path.split('/')[-3]+'_'+os.path.basename(im_path)
+                name = os.path.basename(im_path)
                 # print(name)
-                im, points = generate_data(im_path)
+                path = os.path.join(args.origin_dir, im_path)
+                im, points = generate_data(path)
                 im_save_path = os.path.join(sub_save_dir, name)
                 im.save(im_save_path)
                 gd_save_path = im_save_path.replace('jpg', 'npy')
