@@ -76,7 +76,9 @@ if __name__ == '__main__':
     epoch_minus = []
     it = 0
     for inputs, count, name in dataloader:
-        seq = int(name[3:6])
+        # print(name)
+        seq = int(name[0][3:6])
+        seq = 'DJI_' + str(seq).zfill(4)
         light, angle, bird, size = get_seq_class(seq, 'test')
         inputs = inputs.to(device)
         b, c, h, w = inputs.shape
@@ -152,16 +154,21 @@ if __name__ == '__main__':
             preds[9].append(pred_e)
             gts[9].append(gt_e)
         it += 1
-        print('\r{:>{}}/{}: {}'.format(it, len(str(len(dataloader))), len(dataloader), res), end='')
+        print('\r{:>{}}/{}: {}, pred: {}, gt: {}'.format(it, len(str(len(dataloader))), len(dataloader), res, pred_e, gt_e), end='')
     print()
-    print('max: {}, min: {}'.format(max(np.abs(epoch_minus)), min(np.abs(epoch_minus))))
-    epoch_minus = np.array(epoch_minus)
-    mse = np.sqrt(np.mean(np.square(epoch_minus)))
-    mae = np.mean(np.abs(epoch_minus))
-    log_str = 'mae {}, mse {}'.format(mae, mse)
-    print(log_str)
-    attri = ['sunny', 'backlight', 'crowded', 'sparse', '60', '90', 'stand', 'fly', 'small', 'mid']
-    for i in range(10):
-        if len(preds[i]) == 0:
-            continue
-        print('{}: MAE:{}. RMSE:{}.'.format(attri[i], mean_absolute_error(preds[i], gts[i]), np.sqrt(mean_squared_error(preds[i], gts[i]))))
+    # 输出至txt文件
+    with open('result.txt', 'w') as f:
+        f.write('max: {}, min: {}\n'.format(max(np.abs(epoch_minus)), min(np.abs(epoch_minus))))
+        print('max: {}, min: {}'.format(max(np.abs(epoch_minus)), min(np.abs(epoch_minus))))
+        epoch_minus = np.array(epoch_minus)
+        mse = np.sqrt(np.mean(np.square(epoch_minus)))
+        mae = np.mean(np.abs(epoch_minus))
+        log_str = 'mae {}, mse {}\n'.format(mae, mse)
+        print(log_str)
+        f.write(log_str)
+        attri = ['sunny', 'backlight', 'crowded', 'sparse', '60', '90', 'stand', 'fly', 'small', 'mid']
+        for i in range(10):
+            if len(preds[i]) == 0:
+                continue
+            print('{}: MAE:{}. RMSE:{}.'.format(attri[i], mean_absolute_error(preds[i], gts[i]), np.sqrt(mean_squared_error(preds[i], gts[i]))))
+            f.write('{}: MAE:{}. RMSE:{}.\n'.format(attri[i], mean_absolute_error(preds[i], gts[i]), np.sqrt(mean_squared_error(preds[i], gts[i]))))
