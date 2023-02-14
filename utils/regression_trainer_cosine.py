@@ -170,7 +170,7 @@ class RegTrainer(Trainer):
         self.model.eval()  # Set model to evaluate mode
         epoch_res = []
         # Iterate over data.
-        i = 0
+        it = 0
         for inputs, count, name in self.dataloaders['val']:
             inputs = inputs.to(self.device)
             # inputs are images with different sizes
@@ -212,8 +212,8 @@ class RegTrainer(Trainer):
                     # save_results(inputs, outputs, self.vis_dir, '{}.jpg'.format(name[0]))
                     res = gt -pred
                     epoch_res.append(res)
-            print('\r{:>{}}/{}, res: {:.4f}'.format(i, len(str(len(self.dataloaders['val']))), len(self.dataloaders['val']), res), end='')
-            i += 1
+            print('\r{:>{}}/{}, res: {:.4f}'.format(it, len(str(len(self.dataloaders['val']))), len(self.dataloaders['val']), res), end='')
+            it += 1
         print()
 
         epoch_res = np.array(epoch_res)

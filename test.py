@@ -6,6 +6,7 @@ from models.vgg_c import vgg19_trans
 import argparse
 import math
 from sklearn.metrics import mean_squared_error,mean_absolute_error
+import scipy.io as sio
 args = None
 
 
@@ -19,7 +20,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 def get_seq_class(seq, set):
-    backlight = ['DJI_0021', 'DJI_0032', 'DJI_0202', 'DJI_0339', 'DJI_0340']
+    backlight = ['DJI_0021', 'DJI_0022', 'DJI_0032', 'DJI_0202', 'DJI_0339', 'DJI_0340']
     # cloudy = ['DJI_0519', 'DJI_0554']
     
     # uhd = ['DJI_0332', 'DJI_0334', 'DJI_0339', 'DJI_0340', 'DJI_0342', 'DJI_0343', 'DJI_345', 'DJI_0348', 'DJI_0519', 'DJI_0544']
@@ -47,11 +48,10 @@ def get_seq_class(seq, set):
     # if seq in uhd:
     #     resolution = 'uhd'
     
-    # count = 'sparse'
-    # loca = sio.loadmat(os.path.join(set, seq, 'annotation/000000.mat'))['locations']
-    # if loca.shape[0] > 150:
-    #     count = 'crowded'
-    # return light, resolution, count
+    count = 'sparse'
+    loca = sio.loadmat(os.path.join('../../ds/dronebird/', set, 'ground_truth', 'GT_img'+str(seq[-3:])+'000.mat'))['locations']
+    if loca.shape[0] > 150:
+        count = 'crowded'
     return light, angle, bird, size
 
 
