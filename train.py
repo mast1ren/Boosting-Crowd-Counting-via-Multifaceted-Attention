@@ -21,11 +21,11 @@ def parse_args():
                         help='the path of resume training model')
     parser.add_argument('--max-model-num', type=int, default=1,
                         help='max models num to save ')
-    parser.add_argument('--max-epoch', type=int, default=1200,
+    parser.add_argument('--max-epoch', type=int, default=500,
                         help='max training epoch')
     parser.add_argument('--val-epoch', type=int, default=5,
                         help='the num of steps to log training information')
-    parser.add_argument('--val-start', type=int, default=600,
+    parser.add_argument('--val-start', type=int, default=0,
                         help='the epoch start to val')
     parser.add_argument('--batch-size', type=int, default=1,
                         help='train batch size')
@@ -44,7 +44,7 @@ def parse_args():
                         help='whether to use background modelling')
     parser.add_argument('--sigma', type=float, default=8.0,
                         help='sigma for likelihood')
-    parser.add_argument('--background-ratio', type=float, default=0.15,
+    parser.add_argument('--background-ratio', type=float, default=0.05,
                         help='background ratio')
     args = parser.parse_args()
     return args

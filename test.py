@@ -14,7 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Test ')
     parser.add_argument('--data-dir', default='./preprocessed_data',
                         help='training data directory')
-    parser.add_argument('--save-dir', default='model/model.pth',
+    parser.add_argument('--save-dir', default='model/man_best_model.pth',
                         help='model directory')
     parser.add_argument('--device', default='0', help='assign device')
     args = parser.parse_args()

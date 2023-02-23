@@ -3,7 +3,9 @@ import torch.utils.model_zoo as model_zoo
 import torch
 from torch.nn import functional as F
 from .transformer_cosine import TransformerEncoder, TransformerEncoderLayer
-
+import cv2
+import numpy as np
+from PIL import Image
 
 __all__ = ['vgg19_trans']
 model_urls = {'vgg19': 'https://download.pytorch.org/models/vgg19-dcbb9e9d.pth'}
@@ -37,6 +39,7 @@ class VGG_Trans(nn.Module):
         b, c, h, w = x.shape
         rh = int(h) // 16
         rw = int(w) // 16
+        # x = unevenLightCompensate(x, 16)
         x = self.features(x)   # vgg network
 
         bs, c, h, w = x.shape
@@ -47,6 +50,7 @@ class VGG_Trans(nn.Module):
         x = F.upsample_bilinear(x, size=(rh, rw))
         x = self.reg_layer_0(x)   # regression head
         return torch.relu(x), features
+        # return torch.relu(x)
 
 
 def make_layers(cfg, batch_norm=False):
@@ -76,3 +80,42 @@ def vgg19_trans():
     model = VGG_Trans(make_layers(cfg['E']))
     model.load_state_dict(model_zoo.load_url(model_urls['vgg19']), strict=False)
     return model
+
+
+# def unevenLightCompensate(img, blockSize):
+#     image= img
+#     img = img.squeeze(0).cpu().permute(1,2,0)
+#     # img = cv2.cvtColor(numpy.asarray(img),cv2.COLOR_RGB2BGR)
+#     gray = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2GRAY)
+#     average = np.mean(gray)
+
+#     rows_new = int(np.ceil(gray.shape[0] / blockSize))
+#     cols_new = int(np.ceil(gray.shape[1] / blockSize))
+
+#     blockImage = np.zeros((rows_new, cols_new), dtype=np.float32)
+#     for r in range(rows_new):
+#         for c in range(cols_new):
+#             rowmin = r * blockSize
+#             rowmax = (r + 1) * blockSize
+#             if (rowmax > gray.shape[0]):
+#                 rowmax = gray.shape[0]
+#             colmin = c * blockSize
+#             colmax = (c + 1) * blockSize
+#             if (colmax > gray.shape[1]):
+#                 colmax = gray.shape[1]
+
+#             imageROI = gray[rowmin:rowmax, colmin:colmax]
+#             temaver = np.mean(imageROI)
+#             blockImage[r, c] = temaver
+
+#     blockImage = blockImage - average
+#     blockImage2 = cv2.resize(blockImage, (gray.shape[1], gray.shape[0]), interpolation=cv2.INTER_CUBIC)
+#     gray2 = gray.astype(np.float32)
+#     dst = gray2 - blockImage2
+#     dst = dst.astype(np.uint8)
+#     dst = cv2.GaussianBlur(dst, (3, 3), 0)
+#     dst = cv2.cvtColor(dst, cv2.COLOR_GRAY2RGB)
+#     # cv2.imwrite("./dst.jpg", dst)
+#     dst = torch.from_numpy(dst).float().permute(2,0,1).unsqueeze(0).cuda()
+#     # print(dst.shape)
+#     return dst*0.05+image*0.95
