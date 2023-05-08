@@ -14,31 +14,34 @@ def cal_new_size(im_h, im_w, min_size, max_size):
         if im_h < min_size:
             ratio = 1.0 * min_size / im_h
             im_h = min_size
-            im_w = round(im_w*ratio)
+            im_w = round(im_w * ratio)
         elif im_h > max_size:
             ratio = 1.0 * max_size / im_h
             im_h = max_size
-            im_w = round(im_w*ratio)
+            im_w = round(im_w * ratio)
         else:
             ratio = 1.0
     else:
         if im_w < min_size:
             ratio = 1.0 * min_size / im_w
             im_w = min_size
-            im_h = round(im_h*ratio)
+            im_h = round(im_h * ratio)
         elif im_w > max_size:
             ratio = 1.0 * max_size / im_w
             im_w = max_size
-            im_h = round(im_h*ratio)
+            im_h = round(im_h * ratio)
         else:
             ratio = 1.0
     return im_h, im_w, ratio
 
 
 def find_dis(point):
-    square = np.sum(point*points, axis=1)
-    dis = np.sqrt(np.maximum(
-        square[:, None] - 2*np.matmul(point, point.T) + square[None, :], 0.0))
+    square = np.sum(point * points, axis=1)
+    dis = np.sqrt(
+        np.maximum(
+            square[:, None] - 2 * np.matmul(point, point.T) + square[None, :], 0.0
+        )
+    )
     dis = np.mean(np.partition(dis, 3, axis=1)[:, 1:4], axis=1, keepdims=True)
     return dis
 
@@ -46,11 +49,17 @@ def find_dis(point):
 def generate_data(im_path):
     im = Image.open(im_path)
     im_w, im_h = im.size
-    mat_path = os.path.join(os.path.dirname(im_path).replace(
-        'images', 'ground_truth'), 'GT_'+os.path.basename(im_path).replace('jpg', 'mat'))
+    mat_path = os.path.join(
+        os.path.dirname(im_path).replace('images', 'ground_truth'),
+        'GT_' + os.path.basename(im_path).replace('jpg', 'mat'),
+    )
     points = loadmat(mat_path)['locations'].astype(np.float32)
-    idx_mask = (points[:, 0] >= 0) * (points[:, 0] <= im_w) * \
-        (points[:, 1] >= 0) * (points[:, 1] <= im_h)
+    idx_mask = (
+        (points[:, 0] >= 0)
+        * (points[:, 0] <= im_w)
+        * (points[:, 1] >= 0)
+        * (points[:, 1] <= im_h)
+    )
     points = points[idx_mask]
     im_h, im_w, rr = cal_new_size(im_h, im_w, min_size, max_size)
     im = np.array(im)
@@ -62,10 +71,14 @@ def generate_data(im_path):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Test ')
-    parser.add_argument('--origin-dir', default='../../ds/dronebird',
-                        help='original data directory')
-    parser.add_argument('--data-dir', default='./preprocessed_data',
-                        help='processed data directory')
+    parser.add_argument(
+        '--origin-dir',
+        default='../../nas-public-linkdata/ds/dronebird',
+        help='original data directory',
+    )
+    parser.add_argument(
+        '--data-dir', default='./preprocessed_data', help='processed data directory'
+    )
     args = parser.parse_args()
     return args
 
@@ -96,8 +109,9 @@ if __name__ == '__main__':
                         dis = find_dis(points)
                         points = np.concatenate([points, dis], axis=1)
                     im.save(os.path.join(sub_save_dir, name))
-                    np.save(os.path.join(sub_save_dir,
-                            name.replace('.jpg', '.npy')), points)
+                    np.save(
+                        os.path.join(sub_save_dir, name.replace('.jpg', '.npy')), points
+                    )
                     print('\r{}: {}/{}'.format(sub_phase, i, len(paths)), end='')
                     i += 1
                 print()
@@ -111,7 +125,7 @@ if __name__ == '__main__':
             # im_list = glob(os.path.join(sub_dir, '*jpg'))
             i = 0
             for im_path in im_list:
-                im_path = os.path.join('../../ds/dronebird' ,im_path)
+                # im_path = os.path.join('../../nas-public-linkdata/ds/dronebird', im_path)
                 name = os.path.basename(im_path)
                 # print(name)
                 path = os.path.join(args.origin_dir, im_path)
