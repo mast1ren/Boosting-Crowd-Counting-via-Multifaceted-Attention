@@ -35,6 +35,7 @@ def cal_new_size(im_h, im_w, min_size, max_size):
 def find_dis(point):
     square = np.sum(point*points, axis=1)
     dis = np.sqrt(np.maximum(square[:, None] - 2*np.matmul(point, point.T) + square[None, :], 0.0))
+    print(dis.shape)
     dis = np.mean(np.partition(dis, 3, axis=1)[:, 1:4], axis=1, keepdims=True)
     return dis
 

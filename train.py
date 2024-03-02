@@ -7,7 +7,7 @@ args = None
 def parse_args():
     parser = argparse.ArgumentParser(description='Train ')
     parser.add_argument('--model-name', default='vgg19_trans', help='the name of the model')
-    parser.add_argument('--data-dir', default=r'./preprocessed_data',
+    parser.add_argument('--data-dir', default=r'./VSCrowd/preprocessed_data',
                         help='training data directory')
     parser.add_argument('--save-dir', default='model',
                         help='directory to save models.')

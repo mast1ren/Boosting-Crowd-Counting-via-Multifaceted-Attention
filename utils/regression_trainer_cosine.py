@@ -55,7 +55,7 @@ class RegTrainer(Trainer):
         self.downsample_ratio = args.downsample_ratio
         self.datasets = {
             x: Crowd(
-                os.path.join(args.data_dir, x),
+                os.path.join(args.data_dir, x if x == 'train' else 'test'),
                 args.crop_size,
                 args.downsample_ratio,
                 args.is_gray,

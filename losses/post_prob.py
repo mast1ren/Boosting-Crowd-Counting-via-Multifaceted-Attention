@@ -3,6 +3,17 @@ from torch.nn import Module
 
 class Post_Prob(Module):
     def __init__(self, sigma, c_size, stride, background_ratio, use_background, device):
+        """
+        Initializes the Post_Prob module.
+
+        Args:
+            sigma (float): The sigma value for the distance calculation.
+            c_size (int): The size of the crop.
+            stride (int): The stride value for the distance calculation.
+            background_ratio (float): The ratio of the background distance to the crop size.
+            use_background (bool): Whether to include the background distance in the calculation.
+            device (torch.device): The device to be used for computation.
+        """
         super(Post_Prob, self).__init__()
         assert c_size % stride == 0
 
@@ -17,6 +28,16 @@ class Post_Prob(Module):
         self.use_bg = use_background
 
     def forward(self, points, st_sizes):
+        """
+        Forward pass of the Post_Prob module.
+
+        Args:
+            points (list): A list of tensors containing the coordinates of the points.
+            st_sizes (list): A list of tensors containing the sizes of the crops.
+
+        Returns:
+            prob_list (list): A list of tensors containing the probability distributions for each point.
+        """
         num_points_per_image = [len(points_per_image) for points_per_image in points]
         all_points = torch.cat(points, dim=0)
 
